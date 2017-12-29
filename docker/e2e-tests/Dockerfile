@@ -1,6 +1,12 @@
 # escape=`
 
-FROM sixeyed/msbuild:netfx-4.5.2-10.0.14393.1198 AS builder
+# FROM sixeyed/msbuild:netfx-4.5.2-webdeploy-10.0.14393.1198 AS builder
+FROM dockersamples/modernize-aspnet-builder:10.0.14393.1715 AS builder
+ENV NUGET_PATH="C:\Chocolatey\bin" `
+    MSBUILD_PATH="C:\Program Files (x86)\MSBuild\14.0\Bin"
+
+RUN $env:PATH = $env:NUGET_PATH + ';' + $env:MSBUILD_PATH + ';' + $env:PATH; `
+	[Environment]::SetEnvironmentVariable('PATH', $env:PATH, [EnvironmentVariableTarget]::Machine)
 
 WORKDIR C:\src\SignUp.EndToEndTests
 COPY src\SignUp\SignUp.EndToEndTests\packages.config .

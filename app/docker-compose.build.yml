@@ -7,6 +7,16 @@ services:
       context: ../docker/db
       dockerfile: ./Dockerfile
 
+  elasticsearch:
+    build:
+      context: ../docker/elasticsearch
+      dockerfile: ./Dockerfile
+
+  kibana:
+    build:
+      context: ../docker/kibana
+      dockerfile: ./Dockerfile
+
   web:
     build:
       context: ../

@@ -1,9 +1,18 @@
 # escape=`
 
-FROM sixeyed/msbuild:netfx-4.5.2-webdeploy-10.0.14393.1198 AS builder
+# FROM sixeyed/msbuild:netfx-4.5.2-webdeploy-10.0.14393.1198 AS builder
+FROM dockersamples/modernize-aspnet-builder:10.0.14393.1715 AS builder
 
 WORKDIR C:\src\SignUp.Web
 COPY src\SignUp\SignUp.Web\packages.config .
+
+
+ENV NUGET_PATH="C:\Chocolatey\bin" `
+    MSBUILD_PATH="C:\Program Files (x86)\MSBuild\14.0\Bin"
+
+RUN $env:PATH = $env:NUGET_PATH + ';' + $env:MSBUILD_PATH + ';' + $env:PATH; `
+	[Environment]::SetEnvironmentVariable('PATH', $env:PATH, [EnvironmentVariableTarget]::Machine)
+
 RUN nuget restore packages.config -PackagesDirectory ..\packages
 
 COPY src\SignUp C:\src
@@ -11,7 +20,7 @@ RUN msbuild SignUp.Web.csproj /p:OutputPath=c:\out\web\SignUpWeb `
         /p:DeployOnBuild=true /p:VSToolsPath=C:\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\tools\VSToolsPath
 
 # app image
-FROM microsoft/aspnet:windowsservercore-10.0.14393.1198
+FROM microsoft/aspnet:windowsservercore-10.0.14393.1715
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 RUN Set-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters' -Name ServerPriorityTimeLimit -Value 0 -Type DWord

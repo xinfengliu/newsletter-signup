@@ -3,7 +3,7 @@ version: '3.3'
 services:
   
   db:
-    image: dockersamples/signup-db
+    image: signup-db
     networks:
       - app-net
 
@@ -13,7 +13,7 @@ services:
       - app-net
 
   web:
-    image: dockersamples/signup-web
+    image: signup-web
     depends_on:
       - db
       - message-queue
@@ -21,7 +21,7 @@ services:
       - app-net
 
   save-handler:
-    image: dockersamples/signup-save-handler
+    image: signup-save-handler
     depends_on:
       - db
       - message-queue
@@ -29,7 +29,7 @@ services:
       - app-net
 
   index-handler:
-    image: dockersamples/signup-index-handler
+    image: signup-index-handler
     depends_on:
       - elasticsearch
       - message-queue
@@ -37,14 +37,14 @@ services:
       - app-net
 
   elasticsearch:
-    image: sixeyed/elasticsearch:nanoserver
+    image: elasticsearch:5.2.0-nanoserver
     environment:
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
     networks:
       - app-net
 
   kibana:
-    image: sixeyed/kibana:nanoserver
+    image: kibana:5.2.0-windowsservercore-10.0.14393.1715
     depends_on:
       - elasticsearch
     networks:
