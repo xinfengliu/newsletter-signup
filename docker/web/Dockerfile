@@ -50,5 +50,5 @@ ENV MESSAGE_QUEUE_URL="nats://message-queue:4222" `
 
 ENTRYPOINT ["powershell", "C:\\bootstrap.ps1"]
 
-COPY .\docker\web\bootstrap.ps1 C:\
+COPY .\docker\web\bootstrap.ps1 .\docker\web\ServiceMonitor.exe C:\
 COPY --from=builder C:\out\web\SignUpWeb\_PublishedWebsites\SignUp.Web C:\web-app
