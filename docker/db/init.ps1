@@ -20,10 +20,13 @@ Write-Host 'Starting SQL Server'
 Start-Service MSSQL`$SQLEXPRESS
 
 # set sa password 
-if ($secret_path -ne "_" -and (Test-Path $secret_path)) {
+if ($secret_path -eq "_") {
+   Write-Host "PASSWORD_PATH is not set." 
+} elseif (Test-Path $secret_path) {
     $sa_password = Get-Content -Raw $secret_path
+    Write-Host "Password from file: $sa_password"
 } else {
-    Write-Host "PASSWORD_PATH is not set or SA password not found at: $secret_path"
+    Write-Host "SA password not found at: $secret_path"
 }
 
 if ($sa_password -ne "_") {
@@ -32,26 +35,28 @@ if ($sa_password -ne "_") {
     Invoke-SqlCmd -Query $sqlcmd -ServerInstance ".\SQLEXPRESS" 
 }
 
-# attach database if files exist:
-$mdfPath = "$data_path\${db_name}_Data.mdf"
-$ldfPath = "$data_path\${db_name}_Log.ldf"
+if ( ![string]::IsNullOrEmpty($db_name)) {
+    # attach database if files exist:
+    $mdfPath = "$data_path\${db_name}_Data.mdf"
+    $ldfPath = "$data_path\${db_name}_Log.ldf"
 
-if ((Test-Path $mdfPath) -eq $true) {
-    $sqlcmd = "CREATE DATABASE ${db_name} ON (FILENAME = N'$mdfPath')"    
     if ((Test-Path $mdfPath) -eq $true) {
-        $sqlcmd =  "$sqlcmd, (FILENAME = N'$ldfPath')"
+        $sqlcmd = "CREATE DATABASE ${db_name} ON (FILENAME = N'$mdfPath')"    
+        if ((Test-Path $mdfPath) -eq $true) {
+            $sqlcmd =  "$sqlcmd, (FILENAME = N'$ldfPath')"
+        }
+        $sqlcmd = "$sqlcmd FOR ATTACH;"
+        Write-Verbose 'Data files exist - will create and attach database'
     }
-    $sqlcmd = "$sqlcmd FOR ATTACH;"
-    Write-Verbose 'Data files exist - will create and attach database'
-}
-else {
-    # create database using the volume location:
-    $sqlcmd = 
-    "IF NOT EXISTS(SELECT 1 FROM sys.databases WHERE Name = '${db_name}') 
-      CREATE DATABASE ${db_name} ON 
-       PRIMARY ( NAME = N'${db_name}_Data', FILENAME = N'$mdfPath') 
-       LOG ON ( NAME = N'${db_name}_Log', FILENAME = N'$ldfPath' )"    
-    Write-Verbose 'Data files do not exist - will create new database'
+    else {
+        # create database using the volume location:
+        $sqlcmd = 
+        "IF NOT EXISTS(SELECT 1 FROM sys.databases WHERE Name = '${db_name}') 
+        CREATE DATABASE ${db_name} ON 
+        PRIMARY ( NAME = N'${db_name}_Data', FILENAME = N'$mdfPath') 
+        LOG ON ( NAME = N'${db_name}_Log', FILENAME = N'$ldfPath' )"    
+        Write-Verbose 'Data files do not exist - will create new database'
+    }
 }
 
 Invoke-Sqlcmd -Query $sqlcmd -ServerInstance ".\SQLEXPRESS"
