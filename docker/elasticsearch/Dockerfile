@@ -7,8 +7,9 @@ ENV ES_VERSION="5.2.0" `
     ES_SHA1="243cce802055a06e810fc1939d9f8b22ee68d227" `
     ES_HOME="C:\elasticsearch"
 
-RUN Invoke-WebRequest -outfile elasticsearch.zip "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$($env:ES_VERSION).zip" -UseBasicParsing; `
-    if ((Get-FileHash elasticsearch.zip -Algorithm sha1).Hash -ne $env:ES_SHA1) {exit 1} ; `
+COPY elasticsearch.zip C:\
+#RUN Invoke-WebRequest -outfile elasticsearch.zip "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$($env:ES_VERSION).zip" -UseBasicParsing; `
+RUN if ((Get-FileHash elasticsearch.zip -Algorithm sha1).Hash -ne $env:ES_SHA1) {exit 1} ; `
     Expand-Archive elasticsearch.zip -DestinationPath C:\ ; `
     Move-Item C:/elasticsearch-$($env:ES_VERSION) $env:ES_HOME; `
     Remove-Item elasticsearch.zip
