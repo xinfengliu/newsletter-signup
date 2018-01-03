@@ -8,7 +8,7 @@ ENV ACCEPT_EULA="Y" `
     DATA_PATH="C:\data" 
 
 
-VOLUME ${DATA_PATH}
+#VOLUME ${DATA_PATH}
 
 WORKDIR C:\init
 COPY init.ps1 .

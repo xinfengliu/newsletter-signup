@@ -1,0 +1,28 @@
+version: '3.3'
+networks:
+  app-net: {}
+secrets:
+  signup-db-sa.password:
+    external: true
+  signup-db.connectionstring:
+    external: true
+services:
+  db:
+    deploy:
+      endpoint_mode: dnsrr
+      placement:
+        constraints:
+        - node.platform.os == windows
+    image: signup-db
+    networks:
+      app-net: null
+    secrets:
+    - source: signup-db-sa.password
+    environment:
+    # Do not use double quotes here
+      PASSWORD_PATH: C:\ProgramData\Docker\secrets\signup-db-sa.password
+      DB_NAME: SignUp
+    volumes:
+    # use this only when running "docker stack deploy..." on *Windows* with UCP client bundles.
+    # otherwise, below bind-mount not working (moby/issues/34810)
+      - C:/temp:C:/data

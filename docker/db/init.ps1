@@ -35,6 +35,9 @@ if ($sa_password -ne "_") {
     Invoke-SqlCmd -Query $sqlcmd -ServerInstance ".\SQLEXPRESS" 
 }
 
+# create data directory if not exist
+New-item -type Directory $data_path -force
+
 if ( ![string]::IsNullOrEmpty($db_name)) {
     # attach database if files exist:
     $mdfPath = "$data_path\${db_name}_Data.mdf"

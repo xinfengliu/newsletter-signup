@@ -1,0 +1,26 @@
+version: '3.3'
+networks:
+  app-net: {}
+# even secrets are list here, they will not appear in C:\programdata\docker\secrets because the secrets 
+# are not referenced by the services 
+secrets:
+  signup-db-sa.password:
+    external: true
+  signup-db.connectionstring:
+    external: true
+services:
+  elasticsearch:
+    deploy:
+      endpoint_mode: dnsrr
+      placement:
+        constraints:
+        - node.platform.os == windows
+    environment:
+      ES_JAVA_OPTS: -Xms768m -Xmx768m
+    image: elasticsearch:5.2.0-nanoserver
+    volumes:
+    # use this only when running "docker stack deploy..." on Windows with UCP client bundles.
+    # otherwise, below bind-mount not working (moby/issues/34810)
+      - C:/ESDATA:C:/DATA
+    networks:
+      app-net: null

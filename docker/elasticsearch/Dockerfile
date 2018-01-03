@@ -14,7 +14,9 @@ RUN if ((Get-FileHash elasticsearch.zip -Algorithm sha1).Hash -ne $env:ES_SHA1) 
     Move-Item C:/elasticsearch-$($env:ES_VERSION) $env:ES_HOME; `
     Remove-Item elasticsearch.zip
 
-VOLUME C:\data
+#VOLUME C:\data
+#create C:\data if not exists
+WORKDIR C:\data
 
 # REMARKS - DNS and mount tweaks needed for Windows
 RUN Set-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters' -Name ServerPriorityTimeLimit -Value 0 -Type DWord; `
