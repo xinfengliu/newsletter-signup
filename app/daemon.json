@@ -1,0 +1,1 @@
+{ "allow-nondistributable-artifacts": ["<dtr-domain>:<dtr-port>"] }
